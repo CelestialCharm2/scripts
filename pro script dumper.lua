@@ -397,18 +397,36 @@ page.Button({
 		timedoutscripts = {}
 		scriptsdumped = 0
 
-		for _,v in next, game:GetDescendants() do
-			if (v:IsA("LocalScript") or v:IsA("ModuleScript")) and not isignored(v) then
-				table.insert(scripts, v)
-			end
-		end
-		if s.include_nil then
-			for _,v in next, getnilinstances() do
-				if (v:IsA("LocalScript") or v:IsA("ModuleScript")) and not isignored(v) then
-					table.insert(nilscripts, v)
-				end
-			end
-		end
+	-- Function to iterate through ServerStorage and add scripts to the dump list
+local function collectServerStorageScripts()
+    for _, v in next, game:GetService("ServerStorage"):GetDescendants() do
+        if (v:IsA("LocalScript") or v:IsA("ModuleScript")) and not isignored(v) then
+            table.insert(scripts, v)
+        end
+    end
+end
+
+-- Modify the script collection logic to include ServerStorage
+local function collectScripts()
+    -- Collect scripts from main game and nil instances if enabled
+    for _, v in next, game:GetDescendants() do
+        if (v:IsA("LocalScript") or v:IsA("ModuleScript")) and not isignored(v) then
+            table.insert(scripts, v)
+        end
+    end
+
+    -- Collect scripts from ServerStorage
+    collectServerStorageScripts()
+
+    -- Collect nil scripts if enabled
+    if s.include_nil then
+        for _, v in next, getnilinstances() do
+            if (v:IsA("LocalScript") or v:IsA("ModuleScript")) and not isignored(v) then
+                table.insert(scripts, v)
+            end
+        end
+    end
+end
 
 		task.spawn(function()
 			repeat
